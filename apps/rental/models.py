@@ -1,14 +1,15 @@
 import math
 from decimal import Decimal
-from tkinter.constants import CASCADE
 
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q, F
 from django.db.models.constraints import UniqueConstraint, CheckConstraint
 from django.db.models.enums import TextChoices
-from django.db.models.fields import IntegerField, CharField, DecimalField, PositiveIntegerField, TextField, \
-    BooleanField, DateTimeField
+from django.db.models.fields import (
+    CharField, DecimalField, PositiveIntegerField, TextField,
+    BooleanField, DateTimeField,
+)
 from django.db.models.fields.related import ForeignKey
 from django.conf import settings
 
@@ -35,12 +36,12 @@ class Console(AbstractBaseModel):
     notes = TextField(blank=True)
 
     def is_free_between(self, start_at, end_at, exclude_rental=None):
-        """True if no pending/active retnal overlaps the given time period"""
+        """True if no pending/active rental overlaps the given time period."""
         qs = RentalItem.objects.filter(
             console=self,
             rental__status__in=Rental.BLOCKING_STATUSES,
-            rental__start_at__lt=start_at,
-            retnal__end_at__gt=end_at,
+            rental__start_at__lt=end_at,
+            rental__end_at__gt=start_at,
         )
         if exclude_rental is not None:
             qs = qs.exclude(rental=exclude_rental)
@@ -49,6 +50,9 @@ class Console(AbstractBaseModel):
 
     class Meta:
         ordering = ['platform', 'name']
+
+    def __str__(self):
+        return f"{self.name} ({self.platform})"
 
 class ConsolePrice(AbstractBaseModel):
     console = ForeignKey(Console, on_delete=models.CASCADE, related_name='prices')
@@ -66,12 +70,8 @@ class ConsolePrice(AbstractBaseModel):
             )
         ]
 
-    @property
-    def console_id(self):
-        return self.console.id
-
     def __str__(self):
-        return "f{self.console.name} = {self.name}: {self.price}"
+        return f"{self.console.name} = {self.name}: {self.price}"
 
 class Rental(AbstractBaseModel):
     class Status(TextChoices):
@@ -94,7 +94,7 @@ class Rental(AbstractBaseModel):
     status = CharField(max_length=25, choices=Status.choices, default=Status.PENDING)
     start_at = DateTimeField()
     end_at = DateTimeField()
-    returned_at = DateTimeField()
+    returned_at = DateTimeField(null=True, blank=True)
     delivery_address = TextField(blank=True)
     deposit_amount = DecimalField(max_digits=10, decimal_places=2, default=0)
     notes = TextField(blank=True)
@@ -111,11 +111,11 @@ class Rental(AbstractBaseModel):
         ]
 
     def __str__(self):
-        return "f{self.pk} - {self.customer} ({self.get_status_display()})"
+        return f"#{self.pk} - {self.customer} ({self.get_status_display()})"
 
     def clean(self):
         if self.start_at and self.end_at and self.end_at <= self.start_at:
-            raise ValidationError("End date must be before start date.")
+            raise ValidationError("End date must be after start date.")
 
     @property
     def billable_end(self):
@@ -124,6 +124,11 @@ class Rental(AbstractBaseModel):
     @property
     def total_price(self):
         return sum((item.subtotal for item in self.items.all()), Decimal("0"))
+    @property
+    def duration_minutes(self):
+        """Total rental duration in minutes."""
+        delta = self.billable_end - self.start_at
+        return delta.total_seconds() / 60
 
 
 class RentalItem(AbstractBaseModel):
@@ -143,14 +148,16 @@ class RentalItem(AbstractBaseModel):
     condition_notes = TextField(blank=True)
 
     class Meta:
-        constraints = UniqueConstraint(
-            fields=['rental', 'console'],
-            name='unique_console_per_rental'
-        ),
+        constraints = [
+            UniqueConstraint(
+                fields=['rental', 'console'],
+                name='unique_console_per_rental',
+            ),
+        ]
 
 
     def __str__(self):
-        return "f{self.console} in rental {self.rental_id}"
+        return f"{self.console} in rental {self.rental_id}"
 
     @property
     def units(self):
@@ -163,9 +170,6 @@ class RentalItem(AbstractBaseModel):
     def subtotal(self):
         return self.unit_price * self.units
 
-    @property
-    def console_id(self):
-        return self.console.id
 
     def clean(self):
         if self.pricing and self.pricing.console_id != self.console_id:
