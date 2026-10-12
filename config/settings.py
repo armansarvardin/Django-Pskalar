@@ -31,6 +31,9 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'unfold',
+    'unfold.contrib.filters',
+    'unfold.contrib.forms',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -147,4 +150,67 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
+}
+
+UNFOLD = {
+    'SITE_TITLE': 'Pskalar Admin',
+    'SITE_HEADER': 'Pskalar',
+    'SITE_SYMBOL': 'joystick',
+    'SIDEBAR': {
+        'navigation': [
+            {
+                'title': 'Users',
+                'icon': 'people',
+                'items': [
+                    {
+                        'title': 'Users',
+                        'icon': 'person',
+                        'link': '/admin/auths/user/',
+                    },
+                ],
+            },
+            {
+                'title': 'Rental',
+                'icon': 'sports_esports',
+                'items': [
+                    {
+                        'title': 'Consoles',
+                        'icon': 'videogame_asset',
+                        'link': '/admin/rental/console/',
+                    },
+                    {
+                        'title': 'Console Prices',
+                        'icon': 'sell',
+                        'link': '/admin/rental/consoleprice/',
+                    },
+                    {
+                        'title': 'Rentals',
+                        'icon': 'receipt_long',
+                        'link': '/admin/rental/rental/',
+                    },
+                    {
+                        'title': 'Rental Items',
+                        'icon': 'list_alt',
+                        'link': '/admin/rental/rentalitem/',
+                    },
+                ],
+            },
+            {
+                'title': 'Finance',
+                'icon': 'payments',
+                'items': [
+                    {
+                        'title': 'Invoices',
+                        'icon': 'description',
+                        'link': '/admin/finance/invoice/',
+                    },
+                    {
+                        'title': 'Payments',
+                        'icon': 'credit_card',
+                        'link': '/admin/finance/payment/',
+                    },
+                ],
+            },
+        ],
+    },
 }
