@@ -35,7 +35,10 @@ class Invoice(AbstractBaseModel):
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT,
         related_name='invoices',
+        null=True,
+        blank=True,
     )
+    customer_name = CharField(max_length=100, blank=True, help_text='Walk-in customer name')
     status = CharField(
         max_length=25,
         choices=Status.choices,
@@ -50,7 +53,8 @@ class Invoice(AbstractBaseModel):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"Invoice #{self.pk} - {self.customer} ({self.get_status_display()})"
+        name = self.customer or self.customer_name or 'Walk-in'
+        return f"Invoice #{self.pk} - {name} ({self.get_status_display()})"
 
 
 class Payment(AbstractBaseModel):

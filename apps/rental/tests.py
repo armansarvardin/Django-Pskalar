@@ -116,6 +116,31 @@ class RentalModelTests(TestCase):
         )
         self.assertEqual(rental.total_price, Decimal('0'))
 
+    def test_walkin_rental_no_user(self):
+        rental = Rental.objects.create(
+            customer_name='Bekzod',
+            customer_phone='+998901234567',
+            start_at=self.now,
+            end_at=self.now + timedelta(hours=1),
+        )
+        self.assertIsNone(rental.customer)
+        self.assertEqual(rental.customer_name, 'Bekzod')
+
+    def test_walkin_rental_str(self):
+        rental = Rental.objects.create(
+            customer_name='Sanjar',
+            start_at=self.now,
+            end_at=self.now + timedelta(hours=1),
+        )
+        self.assertIn('Sanjar', str(rental))
+
+    def test_anonymous_walkin_str(self):
+        rental = Rental.objects.create(
+            start_at=self.now,
+            end_at=self.now + timedelta(hours=1),
+        )
+        self.assertIn('Walk-in', str(rental))
+
 
 class RentalAdminTests(TestCase):
     def setUp(self):

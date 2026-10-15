@@ -35,12 +35,28 @@ class RentalItemInline(TabularInline):
 
 @admin.register(Rental)
 class RentalAdmin(ModelAdmin):
-    list_display = ('pk', 'customer', 'status', 'start_at', 'end_at', 'deposit_amount')
+    list_display = ('pk', 'display_customer', 'status', 'start_at', 'end_at', 'deposit_amount')
     list_filter = ('status',)
-    search_fields = ('customer__username', 'customer__first_name', 'customer__last_name')
+    search_fields = (
+        'customer__username', 'customer__first_name', 'customer__last_name',
+        'customer_name', 'customer_phone',
+    )
     ordering = ('-start_at',)
     readonly_fields = ('created_at', 'updated_at')
+    fieldsets = (
+        (None, {'fields': ('status', 'start_at', 'end_at', 'returned_at', 'notes')}),
+        ('Registered Customer', {'fields': ('customer',)}),
+        ('Walk-in Customer', {'fields': ('customer_name', 'customer_phone')}),
+        ('Billing', {'fields': ('delivery_address', 'deposit_amount')}),
+        ('Timestamps', {'fields': ('created_at', 'updated_at')}),
+    )
     inlines = [RentalItemInline]
+
+    @admin.display(description='Customer')
+    def display_customer(self, obj):
+        if obj.customer:
+            return str(obj.customer)
+        return obj.customer_name or 'Walk-in'
 
 
 @admin.register(RentalItem)

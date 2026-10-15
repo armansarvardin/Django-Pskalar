@@ -38,6 +38,20 @@ class InvoiceModelTests(TestCase):
         self.assertIn(str(invoice.pk), str(invoice))
         self.assertIn('Draft', str(invoice))
 
+    def test_walkin_invoice(self):
+        walkin_rental = Rental.objects.create(
+            customer_name='Bekzod',
+            start_at=self.now,
+            end_at=self.now + timedelta(hours=1),
+        )
+        invoice = Invoice.objects.create(
+            rental=walkin_rental,
+            customer_name='Bekzod',
+            total_amount=Decimal('25.00'),
+        )
+        self.assertIsNone(invoice.customer)
+        self.assertIn('Bekzod', str(invoice))
+
 
 class PaymentModelTests(TestCase):
     def setUp(self):

@@ -89,7 +89,11 @@ class Rental(AbstractBaseModel):
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT,
         related_name='rentals',
+        null=True,
+        blank=True,
     )
+    customer_name = CharField(max_length=100, blank=True, help_text='Walk-in customer name')
+    customer_phone = CharField(max_length=20, blank=True, help_text='Walk-in customer phone')
 
     status = CharField(max_length=25, choices=Status.choices, default=Status.PENDING)
     start_at = DateTimeField()
@@ -111,7 +115,8 @@ class Rental(AbstractBaseModel):
         ]
 
     def __str__(self):
-        return f"#{self.pk} - {self.customer} ({self.get_status_display()})"
+        name = self.customer or self.customer_name or 'Walk-in'
+        return f"#{self.pk} - {name} ({self.get_status_display()})"
 
     def clean(self):
         if self.start_at and self.end_at and self.end_at <= self.start_at:

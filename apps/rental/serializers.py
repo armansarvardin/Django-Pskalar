@@ -46,7 +46,8 @@ class RentalSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rental
         fields = [
-            'id', 'customer', 'status', 'start_at', 'end_at',
+            'id', 'customer', 'customer_name', 'customer_phone',
+            'status', 'start_at', 'end_at',
             'returned_at', 'delivery_address', 'deposit_amount',
             'notes', 'items', 'total_price',
             'created_at', 'updated_at',

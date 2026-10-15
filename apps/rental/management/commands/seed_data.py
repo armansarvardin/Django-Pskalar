@@ -294,6 +294,43 @@ class Command(BaseCommand):
             )
             rentals.append(rental)
 
+        # Walk-in rentals (no registered user)
+        walkin_names = [
+            ('Bekzod', '+998901234567'),
+            ('Sanjar', '+998937654321'),
+            ('Asilbek', '+998946543210'),
+            ('Nodir', '+998951112233'),
+            ('Ulugbek', ''),
+            ('', ''),
+        ]
+        for name, phone in walkin_names:
+            start = now - timedelta(days=random.randint(1, 14), hours=random.randint(10, 20))
+            tier = random.choice(PRICE_TIERS[:3])  # 30min, 1h, 2h
+            end = start + timedelta(minutes=tier[1])
+            returned = end + timedelta(minutes=random.randint(0, 10))
+
+            rental = Rental.objects.create(
+                customer_name=name,
+                customer_phone=phone,
+                status=Rental.Status.COMPLETED,
+                start_at=start,
+                end_at=end,
+                returned_at=returned,
+                deposit_amount=Decimal('50000'),
+                notes='Walk-in customer' if name else 'Anonymous walk-in',
+            )
+            console = random.choice(available_consoles)
+            cp = random.choice(all_prices[console.pk])
+            RentalItem.objects.create(
+                rental=rental,
+                console=console,
+                pricing=cp,
+                unit_minutes=cp.duration_minutes,
+                unit_price=cp.price,
+                returned_at=returned,
+            )
+            rentals.append(rental)
+
         self.stdout.write(self.style.SUCCESS(f'  {len(rentals)} rentals created'))
 
         # ── Invoices & Payments ──────────────────────────
@@ -325,6 +362,7 @@ class Command(BaseCommand):
             invoice = Invoice.objects.create(
                 rental=rental,
                 customer=rental.customer,
+                customer_name=rental.customer_name if not rental.customer else '',
                 status=inv_status,
                 total_amount=total,
                 issued_at=issued,
