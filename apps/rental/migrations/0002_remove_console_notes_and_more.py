@@ -11,10 +11,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='console',
-            name='notes',
-        ),
         migrations.AlterField(
             model_name='consoleprice',
             name='duration_minutes',

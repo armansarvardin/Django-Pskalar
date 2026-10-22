@@ -41,6 +41,7 @@ class Console(AbstractBaseModel):
     status = CharField(max_length=25, choices=Status.choices, default=Status.AVAILABLE)
     deposit = DecimalField(max_digits=10, decimal_places=2, default=2)
     gamepads_included = PositiveIntegerField(default=2)
+    notes = TextField(blank=True)
 
     def __str__(self) -> str:
         return self.name
