@@ -18,8 +18,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
+from django.contrib import admin
+from django.urls import include, path
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include("apps.rental.urls")),
+    path("api/finance/", include("apps.finance.urls")),
     path("api-auth/", include("rest_framework.urls")),
 ]
