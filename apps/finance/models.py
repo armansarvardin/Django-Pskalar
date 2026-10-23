@@ -87,7 +87,16 @@ class Payment(AbstractBaseModel):
         "rental.Rental",
         on_delete=models.PROTECT,
         related_name="payments",
+        null=True,
+        blank=True,
     )
+    sale = models.ForeignKey(
+        "store.Sale",
+        on_delete=models.PROTECT,
+        related_name="payments",
+        null=True,
+        blank=True,
+        )
 
     shift = models.ForeignKey(
         "finance.Shift",
@@ -129,6 +138,17 @@ class Payment(AbstractBaseModel):
         null=True,
         blank=True,
     )
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                condition=(
+                    models.Q(rental__isnull=False, sale__isnull=True)
+                    | models.Q(rental__isnull=True, sale__isnull=False)
+                ),
+                name = "payments_for_rental_or_sale",
+            ),
+        ]
 
     def __str__(self):
         return f"Payment #{self.pk} - {self.amount} tenge"

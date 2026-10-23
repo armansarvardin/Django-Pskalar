@@ -27,9 +27,9 @@ class PaymentInline(TabularInline):
     model = Payment
     form = PaymentAdminForm
     extra = 0
-    fields = ("rental", "method", "amount", "commission_amount", "status", "external_ref", "paid_at")
+    fields = ("rental", "sale", "method", "amount", "commission_amount", "status", "external_ref", "paid_at")
     readonly_fields = ("commission_amount",)
-    raw_id_fields = ("rental",)
+    raw_id_fields = ("rental", "sale")
     show_change_link = True
 
 class ExpenseInline(TabularInline):
@@ -86,11 +86,11 @@ class ShiftAdmin(SoftDeleteAdmin):
 @register(Payment)
 class PaymentAdmin(SoftDeleteAdmin):
     form = PaymentAdminForm
-    list_display = ("id", "rental", "method", "amount", "commission_amount", "status", "paid_at", "shift")
+    list_display = ("id", "rental", "sale", "method", "amount", "commission_amount", "status", "paid_at", "shift")
     list_display_links = ("id", "rental")
     search_fields = ("external_ref",)
     date_hierarchy = "paid_at"
-    raw_id_fields = ("rental", "shift")
+    raw_id_fields = ("rental", "sale", "shift")
     readonly_fields = ("commission_amount", "paid_at", "created_at", "updated_at", "deleted_at")
 
     def save_model(self, request, obj, form, change):
