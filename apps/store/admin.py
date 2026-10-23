@@ -1,8 +1,9 @@
 from decimal import Decimal
 
-from django.contrib.admin import ModelAdmin, TabularInline, display, register
+from django.contrib.admin import display, register
 from django.http import HttpRequest
 from django.utils.safestring import mark_safe
+from unfold.admin import ModelAdmin, TabularInline
 
 from apps.store.filters import LowStockFilter
 from apps.store.models import Category, Product, Sale, SaleItem

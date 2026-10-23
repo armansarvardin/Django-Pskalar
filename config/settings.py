@@ -212,6 +212,27 @@ UNFOLD = {
                     },
                 ],
             },
+            {
+                'title': 'Store',
+                'icon': 'storefront',
+                'items': [
+                    {
+                        'title': 'Categories',
+                        'icon': 'category',
+                        'link': '/admin/store/category/',
+                    },
+                    {
+                        'title': 'Products',
+                        'icon': 'inventory_2',
+                        'link': '/admin/store/product/',
+                    },
+                    {
+                        'title': 'Sales',
+                        'icon': 'point_of_sale',
+                        'link': '/admin/store/sale/',
+                    },
+                ],
+            },
         ],
     },
 }
