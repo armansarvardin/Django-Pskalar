@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'apps.auths',
     'apps.finance',
     'apps.rental',
+    'apps.store',
 ]
 
 MIDDLEWARE = [
